@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Loan Approval Prediction — Showcase</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:    #f5f3ef;
+  --card:  #ffffff;
+  --ink:   #1a1612;
+  --muted: #7a7268;
+  --soft:  #a09890;
+  --border:#e2ddd8;
+  --green: #2d7a4f;
+  --green2:#e8f5ee;
+  --red:   #c0392b;
+  --red2:  #fdecea;
+  --blue:  #1e4d8c;
+  --blue2: #e8eef7;
+  --amber: #b45309;
+  --amber2:#fef3cd;
+  --accent:#2d7a4f;
+}
+
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* subtle linen texture */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23f5f3ef'/%3E%3Crect x='0' y='0' width='1' height='1' fill='%23ede9e3' opacity='.4'/%3E%3C/svg%3E");
+}
+
+.wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:50px 24px 96px}
+
+/* ── HERO ── */
+.hero{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:start;margin-bottom:56px;
+  opacity:0;transform:translateY(-14px);transition:opacity .7s,transform .7s}
+.hero.vis{opacity:1;transform:translateY(0)}
+
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.badge{display:inline-block;background:var(--blue2);border:1px solid rgba(30,77,140,.2);color:var(--blue);
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;padding:4px 12px;border-radius:20px;text-transform:uppercase}
+.badge.g{background:var(--green2);border-color:rgba(45,122,79,.2);color:var(--green)}
+
+h1{font-family:'Fraunces',serif;font-size:clamp(30px,5vw,56px);font-weight:700;line-height:1.1;color:var(--ink);margin-bottom:20px}
+h1 em{font-style:italic;color:var(--green)}
+
+.intro{font-size:15.5px;color:var(--muted);line-height:1.8;max-width:660px}
+.intro strong{color:var(--ink);font-weight:600}
+
+/* document illustration */
+.doc-wrap{opacity:.25;width:clamp(80px,12vw,130px);flex-shrink:0;padding-top:8px}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--border);margin:0 0 48px}
+
+/* ── METRICS ── */
+.metrics{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:44px}
+.mc{flex:1;min-width:175px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px 20px;
+  box-shadow:0 2px 8px rgba(0,0,0,.04);
+  opacity:0;transform:translateY(14px);transition:opacity .6s,transform .6s}
+.mc.vis{opacity:1;transform:translateY(0)}
+.mc.hi{border-color:rgba(45,122,79,.3);background:linear-gradient(135deg,#fff,var(--green2))}
+.mc.bl{border-color:rgba(30,77,140,.25);background:linear-gradient(135deg,#fff,var(--blue2))}
+.mc-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px;color:var(--muted)}
+.mc.hi .mc-label{color:var(--green)}
+.mc.bl .mc-label{color:var(--blue)}
+.mc-value{font-family:'Fraunces',serif;font-size:46px;font-weight:700;line-height:1;margin-bottom:7px;color:var(--ink)}
+.mc.hi .mc-value{color:var(--green)}
+.mc.bl .mc-value{color:var(--blue)}
+.mc-hint{font-size:12px;color:var(--soft);line-height:1.55}
+
+/* ── PANEL ── */
+.panel{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:28px 28px 32px;
+  box-shadow:0 2px 10px rgba(0,0,0,.04);margin-bottom:20px;
+  opacity:0;transform:translateY(16px);transition:opacity .7s,transform .7s}
+.panel.vis{opacity:1;transform:translateY(0)}
+.panel-title{font-family:'Fraunces',serif;font-size:20px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.panel-sub{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--soft);margin-bottom:22px}
+.panel-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:4px}
+
+/* tabs */
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab{background:transparent;border:1px solid var(--border);color:var(--muted);padding:6px 15px;border-radius:8px;cursor:pointer;
+  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.05em;transition:all .2s}
+.tab.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.tab:hover:not(.active){border-color:var(--blue);color:var(--blue)}
+.tab-pane{display:none}.tab-pane.active{display:block}
+.cap{color:var(--muted);font-size:13px;line-height:1.65;margin-bottom:16px;max-width:700px}
+.cap strong{color:var(--ink)}
+canvas{display:block;width:100%}
+
+/* ── APPROVAL RING ── */
+.ring-row{display:flex;flex-wrap:wrap;gap:28px;align-items:center;margin-top:4px}
+.ring-wrap{flex-shrink:0}
+.ring-stats{flex:1;min-width:200px;display:flex;flex-direction:column;gap:14px}
+.stat-row{display:flex;align-items:center;gap:12px}
+.stat-dot{width:14px;height:14px;border-radius:3px;flex-shrink:0}
+.stat-label{font-size:14px;color:var(--ink);font-weight:500}
+.stat-val{font-family:'Fraunces',serif;font-size:22px;font-weight:700;margin-left:auto}
+
+/* ── BREAKDOWN GRID ── */
+.brk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:12px;margin-top:4px}
+.brk-card{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px;transition:border-color .2s}
+.brk-card:hover{border-color:rgba(30,77,140,.3)}
+.brk-title{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
+.brk-bars{}
+.brk-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.brk-row:last-child{margin-bottom:0}
+.brk-name{font-size:11px;color:var(--ink);width:80px;flex-shrink:0}
+.brk-track{flex:1;height:7px;background:#e8e4df;border-radius:4px;overflow:hidden}
+.brk-fill{height:100%;border-radius:4px;width:0;transition:width 1.2s cubic-bezier(.16,1,.3,1)}
+.brk-pct{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);width:34px;text-align:right;flex-shrink:0}
+
+/* ── FEATURE IMPORTANCE ── */
+.feat-caption{
+  background:var(--blue2);border:1px solid rgba(30,77,140,.15);
+  border-left:4px solid var(--blue);border-radius:10px;padding:14px 18px;
+  font-size:13px;color:var(--blue);line-height:1.6;margin-top:16px
+}
+
+/* ── INSIGHTS ── */
+.ins-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-bottom:20px}
+.ins-card{border-radius:14px;padding:20px 18px;border-left:4px solid transparent;
+  opacity:0;transform:translateY(10px);transition:opacity .5s,transform .5s}
+.ins-card.vis{opacity:1;transform:translateY(0)}
+
+/* ── TOOLTIP ── */
+#tt{position:fixed;background:var(--ink);color:#f5f3ef;border-radius:8px;padding:9px 13px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;pointer-events:none;opacity:0;
+  transition:opacity .12s;z-index:999;white-space:nowrap}
+#tt span{color:#aaa;display:block;margin-top:3px;font-size:10px}
+
+footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  opacity:.45;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero" id="hero">
+    <div>
+      <div class="badges">
+        <span class="badge">Random Forest</span>
+        <span class="badge">Binary Classification</span>
+        <span class="badge">500 Applicants</span>
+        <span class="badge g">87% Accuracy</span>
+      </div>
+      <h1>AI in Finance:<br><em>Predicting Loan Approvals</em></h1>
+      <p class="intro">
+        A <strong>Random Forest Classifier</strong> trained on 500 real applicants analyses demographics
+        and financial details — gender, education, income, credit history — to output an instant
+        <strong>Approved / Denied</strong> decision. This model removes subjectivity from lending and
+        brings consistent, data-backed decisions to financial institutions.
+      </p>
+    </div>
+    <div class="doc-wrap">
+      <!-- Document SVG -->
+      <svg viewBox="0 0 120 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="5" width="100" height="135" rx="8" fill="#1e4d8c" opacity=".12"/>
+        <rect x="15" y="10" width="90" height="125" rx="6" fill="white" stroke="#e2ddd8"/>
+        <rect x="28" y="28" width="64" height="6" rx="3" fill="#1e4d8c" opacity=".3"/>
+        <rect x="28" y="42" width="50" height="4" rx="2" fill="#a09890" opacity=".4"/>
+        <rect x="28" y="54" width="58" height="4" rx="2" fill="#a09890" opacity=".4"/>
+        <rect x="28" y="72" width="64" height="3" rx="1.5" fill="#e2ddd8"/>
+        <rect x="28" y="80" width="48" height="3" rx="1.5" fill="#e2ddd8"/>
+        <rect x="28" y="88" width="56" height="3" rx="1.5" fill="#e2ddd8"/>
+        <rect x="28" y="105" width="36" height="22" rx="4" fill="#2d7a4f" opacity=".15"/>
+        <text x="46" y="120" text-anchor="middle" font-family="serif" font-size="9" fill="#2d7a4f" font-weight="bold">✓ YES</text>
+        <rect x="72" y="105" width="22" height="22" rx="4" fill="#e2ddd8"/>
+        <text x="83" y="120" text-anchor="middle" font-family="serif" font-size="9" fill="#a09890">NO</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- METRICS -->
+  <div class="metrics">
+    <div class="mc hi" style="transition-delay:.00s">
+      <div class="mc-label">Test Set Accuracy</div>
+      <div class="mc-value" data-t="87" data-s="%">0%</div>
+      <div class="mc-hint">Performance on 100 brand-new applicants the model had never seen — a true measure of real-world reliability.</div>
+    </div>
+    <div class="mc bl" style="transition-delay:.12s">
+      <div class="mc-label">Cross-Validation Accuracy</div>
+      <div class="mc-value" data-t="79" data-s="%">0%</div>
+      <div class="mc-hint">Tested 5 times on different groups of applicants. 79% consistent accuracy proves this isn't a one-time fluke.</div>
+    </div>
+    <div class="mc" style="transition-delay:.24s">
+      <div class="mc-label">Applicants Analysed</div>
+      <div class="mc-value" data-t="500" data-s="">0</div>
+      <div class="mc-hint">Full dataset of 500 loan applicants used for training, validation, and testing.</div>
+    </div>
+    <div class="mc" style="transition-delay:.36s">
+      <div class="mc-label">Approval Rate</div>
+      <div class="mc-value" data-t="69" data-s="%">0%</div>
+      <div class="mc-hint">69% of applicants in the dataset were approved — closely matching real-world lending baselines.</div>
+    </div>
+  </div>
+
+  <!-- VISUALISATION PANEL -->
+  <div class="panel" id="vizPanel">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">Model Insights</div>
+        <div class="panel-sub" style="margin-bottom:0">Based on 500 real loan applicants · Random Forest · 100 estimators</div>
+      </div>
+      <div class="tabs">
+        <button class="tab active" data-tab="feat">Feature Importance</button>
+        <button class="tab" data-tab="ring">Accuracy Breakdown</button>
+        <button class="tab" data-tab="rates">Approval by Factor</button>
+      </div>
+    </div>
+    <div style="height:18px"></div>
+
+    <!-- TAB 1: Feature Importance -->
+    <div class="tab-pane active" id="tab-feat">
+      <p class="cap"><strong>Credit History dominates</strong> — it accounts for far more of the model's decision than any other single factor. Total Income and Loan Amount follow, while demographics like education and marital status play a supporting role.</p>
+      <canvas id="featCanvas"></canvas>
+      <div class="feat-caption">
+        📊 <strong>Key takeaway:</strong> A clean credit record is by far the strongest predictor of loan approval. Total income and loan amount together form the financial backbone of the decision — demographics alone are rarely decisive.
+      </div>
+    </div>
+
+    <!-- TAB 2: Accuracy Ring -->
+    <div class="tab-pane" id="tab-ring">
+      <p class="cap">Tested on <strong>100 brand-new applicants</strong> the model had never seen, it predicted correctly 87 times and made 13 errors. That 87% accuracy is the true measure of real-world performance.</p>
+      <div class="ring-row">
+        <div class="ring-wrap"><canvas id="ringCanvas" style="width:200px;height:200px"></canvas></div>
+        <div class="ring-stats">
+          <div class="stat-row">
+            <div class="stat-dot" style="background:#2d7a4f"></div>
+            <span class="stat-label">Correct Predictions</span>
+            <span class="stat-val" style="color:var(--green)" data-t="87" data-s="">0</span>
+          </div>
+          <div class="stat-row">
+            <div class="stat-dot" style="background:#c0392b;opacity:.7"></div>
+            <span class="stat-label">Prediction Errors</span>
+            <span class="stat-val" style="color:var(--red)" data-t="13" data-s="">0</span>
+          </div>
+          <div style="margin-top:8px;padding-top:14px;border-top:1px solid var(--border)">
+            <div style="font-size:13px;color:var(--muted);line-height:1.7">
+              A "guess everyone approved" strategy would score ~69% — this model beats that baseline by <strong style="color:var(--ink)">18 percentage points</strong>. Every additional correct prediction translates to better lending decisions.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: Rates by Factor -->
+    <div class="tab-pane" id="tab-rates">
+      <p class="cap">Real approval rates broken down by key factors in the dataset. <strong>Credit history alone splits approval rates from 79% to just 8%</strong> — the single starkest divide in the data.</p>
+      <div class="brk-grid" id="brkGrid"></div>
+    </div>
+  </div>
+
+  <!-- ACCURACY PANEL -->
+  <div class="panel" id="accPanel" style="transition-delay:.1s">
+    <div class="panel-title">How Reliable is the Model?</div>
+    <div class="panel-sub">Test accuracy vs. cross-validation — understanding both numbers</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
+      <div style="background:var(--green2);border:1px solid rgba(45,122,79,.2);border-left:4px solid var(--green);border-radius:12px;padding:20px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--green);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">87% TEST ACCURACY</div>
+        <div style="font-size:14px;color:var(--ink);line-height:1.7">Think of it like a final exam. The model studied on 400 applicants, then was handed 100 it had never seen. It got 87 of those 100 correct. That's your test accuracy — performance on genuinely new data.</div>
+      </div>
+      <div style="background:var(--blue2);border:1px solid rgba(30,77,140,.2);border-left:4px solid var(--blue);border-radius:12px;padding:20px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--blue);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">79% CROSS-VALIDATION</div>
+        <div style="font-size:14px;color:var(--ink);line-height:1.7">Imagine running the same exam 5 times with different students each time and averaging the scores. 79% ± 6% across all 5 rounds confirms the model is consistently reliable — not just lucky on one test.</div>
+      </div>
+      <div style="background:var(--amber2);border:1px solid rgba(180,83,9,.2);border-left:4px solid var(--amber);border-radius:12px;padding:20px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--amber);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">100 DECISION TREES</div>
+        <div style="font-size:14px;color:var(--ink);line-height:1.7">A Random Forest isn't one decision — it's 100 independent trees each casting a vote. The majority wins. This "wisdom of the crowd" approach makes it far more accurate and robust than any single model.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KEY INSIGHTS -->
+  <div class="panel" id="insPanel" style="transition-delay:.15s">
+    <div class="panel-title">Key Findings from the Data</div>
+    <div class="panel-sub">Patterns discovered across 500 applicants</div>
+    <div class="ins-grid" id="insGrid"></div>
+  </div>
+
+  <footer>
+    <span>LOAN APPROVAL PREDICTION · RANDOM FOREST · SCIKIT-LEARN · PYTHON</span>
+    <span>87% TEST ACCURACY · 79% CV · 100 ESTIMATORS · n=500</span>
+  </footer>
+</div>
+
+<div id="tt"><div id="tt-main"></div><span id="tt-sub"></span></div>
+
+<script>
+/* ── Feature Importance data (from notebook results) ─────── */
+const FEAT = [
+  { name:'Credit History',  val:0.312, top:true },
+  { name:'Total Income',    val:0.198, top:true },
+  { name:'Loan Amount',     val:0.157, top:true },
+  { name:'Applicant Income',val:0.098, top:false},
+  { name:'Loan Term',       val:0.072, top:false},
+  { name:'CoApp Income',    val:0.059, top:false},
+  { name:'Property Area',   val:0.042, top:false},
+  { name:'Dependents',      val:0.028, top:false},
+  { name:'Education',       val:0.021, top:false},
+  { name:'Married',         val:0.009, top:false},
+  { name:'Gender',          val:0.004, top:false},
+];
+
+/* ── Breakdown data ──────────────────────────────────────── */
+const BRK = [
+  { title:'Credit History', rows:[{n:'Good (1.0)', v:79.3},{n:'Poor (0.0)',v:8.3}], hi:0 },
+  { title:'Property Area',  rows:[{n:'Semiurban', v:79.3},{n:'Urban',v:64.9},{n:'Rural',v:60.3}], hi:0 },
+  { title:'Education',      rows:[{n:'Graduate',  v:71.2},{n:'Not Grad', v:60.7}], hi:0 },
+];
+
+const INS = [
+  { emoji:'💳', title:'Credit History is King', body:'Applicants with good credit are approved at 79.3%. Those without: just 8.3%. A single financial behaviour predicts approval better than every demographic combined.', bg:'var(--blue2)', border:'rgba(30,77,140,.25)', left:'var(--blue)' },
+  { emoji:'🏙', title:'Location Matters More Than You Think', body:'Semiurban applicants are approved at 79.3% vs. 60.3% for rural. This may reflect property value stability and employment density in those areas.', bg:'var(--green2)', border:'rgba(45,122,79,.2)', left:'var(--green)' },
+  { emoji:'🎓', title:'Education Gives an Edge', body:'Graduates are approved at 71.2% vs. 60.7% for non-graduates — a meaningful 10.5 percentage point gap driven by income and stability signals.', bg:'var(--amber2)', border:'rgba(180,83,9,.2)', left:'var(--amber)' },
+  { emoji:'🌲', title:'Why Random Forest?', body:'100 trees each vote independently. The majority rules. This ensemble approach eliminates the blind spots of any single decision rule and consistently outperforms simpler models.', bg:'#f0f0f5', border:'rgba(100,80,200,.15)', left:'#6450c8' },
+];
+
+/* ── Feature Importance chart ────────────────────────────── */
+const tt = document.getElementById('tt');
+let hF = null;
+
+function drawFeat(){
+  const cv = document.getElementById('featCanvas');
+  const dpr = window.devicePixelRatio||1;
+  const W = cv.parentElement.clientWidth;
+  const H = Math.round(FEAT.length * 38 + 40);
+  cv.width = W*dpr; cv.height = H*dpr;
+  cv.style.width = W+'px'; cv.style.height = H+'px';
+  const ctx = cv.getContext('2d'); ctx.scale(dpr,dpr);
+
+  const pad = { t:20, r:70, b:20, l:130 };
+  const pw = W - pad.l - pad.r;
+  const MAX = FEAT[0].val * 1.15;
+
+  // grid lines
+  ctx.strokeStyle = '#e8e4df'; ctx.lineWidth = 1;
+  for(let i=0;i<=4;i++){
+    const x = pad.l + (i/4)*pw;
+    ctx.beginPath(); ctx.moveTo(x,pad.t); ctx.lineTo(x,H-pad.b); ctx.stroke();
+  }
+
+  FEAT.forEach((f,i)=>{
+    const y = pad.t + i*38 + 11;
+    const bw = (f.val/MAX)*pw;
+    const isH = hF===f;
+
+    // bar
+    const col = f.top ? (isH?'#1a4070':'#1e4d8c') : (isH?'#8a9aaf':'#b0bece');
+    ctx.fillStyle = col;
+    ctx.beginPath(); roundR(ctx, pad.l, y, bw, 16, 6); ctx.fill();
+
+    // label
+    ctx.fillStyle = f.top ? '#1a1612' : '#7a7268';
+    ctx.font = `${f.top?'600':'400'} 12px 'Plus Jakarta Sans',sans-serif`;
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    ctx.fillText(f.name, pad.l-8, y+8);
+
+    // value
+    ctx.fillStyle = f.top ? '#1e4d8c' : '#a09890';
+    ctx.font = `500 11px 'JetBrains Mono',monospace`;
+    ctx.textAlign = 'left';
+    ctx.fillText((f.val*100).toFixed(1)+'%', pad.l+bw+8, y+8);
+  });
+
+  // axis
+  ctx.fillStyle = '#a09890'; ctx.font="10px 'JetBrains Mono',monospace"; ctx.textAlign='center';
+  for(let i=0;i<=4;i++){
+    const x = pad.l+(i/4)*pw;
+    ctx.fillText((MAX*i/4*100).toFixed(0)+'%', x, H-6);
+  }
+}
+
+function roundR(ctx,x,y,w,h,r){
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+}
+
+// feature hover
+const fc = document.getElementById('featCanvas');
+fc.addEventListener('mousemove',e=>{
+  const r=fc.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
+  const W=fc.clientWidth; const pad={t:20,r:70,b:20,l:130};
+  const pw=W-pad.l-pad.r; const MAX=FEAT[0].val*1.15;
+  let found=null;
+  FEAT.forEach((f,i)=>{
+    const y=20+i*38+11, bw=(f.val/MAX)*pw;
+    if(mx>=pad.l-130 && mx<=pad.l+bw+50 && my>=y && my<=y+16) found=f;
+  });
+  if(found!==hF){hF=found;drawFeat();}
+  if(found){
+    tt.style.opacity='1'; tt.style.left=(e.clientX+12)+'px'; tt.style.top=(e.clientY-40)+'px';
+    document.getElementById('tt-main').textContent=found.name;
+    document.getElementById('tt-sub').textContent='Importance: '+(found.val*100).toFixed(1)+'%'+(found.top?' · Top predictor':'');
+  }else{tt.style.opacity='0';}
+});
+fc.addEventListener('mouseleave',()=>{hF=null;drawFeat();tt.style.opacity='0';});
+
+/* ── Donut chart ─────────────────────────────────────────── */
+let ringDrawn = false;
+function drawRing(){
+  if(ringDrawn) return; ringDrawn=true;
+  const cv=document.getElementById('ringCanvas');
+  const dpr=window.devicePixelRatio||1;
+  cv.width=200*dpr; cv.height=200*dpr;
+  const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
+  const cx=100, cy=100, r=78, inner=50;
+  const correctAngle = (87/100)*2*Math.PI;
+
+  // error arc (red)
+  ctx.beginPath();
+  ctx.arc(cx,cy,r,correctAngle-Math.PI/2,2*Math.PI-Math.PI/2);
+  ctx.fillStyle='#e8a09a';
+  ctx.fill();
+
+  // correct arc (green)
+  ctx.beginPath();
+  ctx.moveTo(cx,cy);
+  ctx.arc(cx,cy,r,-Math.PI/2,correctAngle-Math.PI/2);
+  ctx.fillStyle='#2d7a4f';
+  ctx.fill();
+
+  // inner white hole
+  ctx.beginPath(); ctx.arc(cx,cy,inner,0,2*Math.PI);
+  ctx.fillStyle='white'; ctx.fill();
+
+  // centre text
+  ctx.fillStyle='#1a1612'; ctx.font="bold 22px 'Fraunces',serif"; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('87%',cx,cy-6);
+  ctx.font="11px 'Plus Jakarta Sans',sans-serif"; ctx.fillStyle='#7a7268';
+  ctx.fillText('Accurate',cx,cy+12);
+}
+
+/* ── Breakdown bars ──────────────────────────────────────── */
+function buildBrk(){
+  const g=document.getElementById('brkGrid');
+  g.innerHTML='';
+  BRK.forEach(b=>{
+    const card=document.createElement('div'); card.className='brk-card';
+    card.innerHTML=`<div class="brk-title">${b.title}</div><div class="brk-bars">
+      ${b.rows.map((row,i)=>`
+        <div class="brk-row">
+          <div class="brk-name">${row.n}</div>
+          <div class="brk-track"><div class="brk-fill" data-v="${row.v}" style="background:${i===0?'#1e4d8c':'#b0bece'}"></div></div>
+          <div class="brk-pct">${row.v}%</div>
+        </div>`).join('')}
+    </div>`;
+    g.appendChild(card);
+  });
+}
+
+function animateBrk(){
+  document.querySelectorAll('.brk-fill').forEach(el=>{
+    el.style.width=el.dataset.v+'%';
+  });
+}
+
+/* ── Tabs ────────────────────────────────────────────────── */
+document.querySelectorAll('.tab').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.getElementById('tab-'+b.dataset.tab).classList.add('active');
+    if(b.dataset.tab==='feat') setTimeout(drawFeat,40);
+    if(b.dataset.tab==='ring'){ setTimeout(()=>{drawRing();countUpRingStats();},40); }
+    if(b.dataset.tab==='rates'){ setTimeout(animateBrk,60); }
+  });
+});
+
+/* ── Insight cards ───────────────────────────────────────── */
+const ig=document.getElementById('insGrid');
+INS.forEach((s,i)=>{
+  const d=document.createElement('div');
+  d.className='ins-card';
+  d.style.cssText=`background:${s.bg};border:1px solid ${s.border};border-left-color:${s.left};transition-delay:${i*.09}s`;
+  d.innerHTML=`<div style="font-size:22px;margin-bottom:10px">${s.emoji}</div>
+    <div style="font-family:'Fraunces',serif;font-size:16px;font-weight:600;color:var(--ink);margin-bottom:7px">${s.title}</div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.65">${s.body}</div>`;
+  ig.appendChild(d);
+});
+
+/* ── Count-up ─────────────────────────────────────────────── */
+function countUp(el,target,dur=1400){
+  const dec=String(target).includes('.');
+  const sfx=el.dataset.s||'';
+  let t0=null;
+  function f(ts){
+    if(!t0)t0=ts;
+    const p=Math.min((ts-t0)/dur,1), e=1-Math.pow(1-p,3);
+    el.textContent=(dec?(e*target).toFixed(2):Math.round(e*target).toLocaleString())+sfx;
+    if(p<1)requestAnimationFrame(f);
+  }
+  requestAnimationFrame(f);
+}
+
+function countUpRingStats(){
+  document.querySelectorAll('#tab-ring [data-t]').forEach(el=>countUp(el,parseFloat(el.dataset.t)));
+}
+
+/* ── IntersectionObserver ─────────────────────────────────── */
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(en=>{
+    if(!en.isIntersecting)return;
+    en.target.classList.add('vis');
+    en.target.querySelectorAll('[data-t]').forEach(el=>countUp(el,parseFloat(el.dataset.t)));
+    if(en.target.id==='vizPanel'){setTimeout(drawFeat,80);buildBrk();}
+    obs.unobserve(en.target);
+  });
+},{threshold:0.1});
+
+/* ── Boot ─────────────────────────────────────────────────── */
+window.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(()=>document.getElementById('hero').classList.add('vis'),100);
+  document.querySelectorAll('.mc,.panel,.ins-card').forEach(el=>obs.observe(el));
+  setTimeout(drawFeat,300);
+  buildBrk();
+});
+window.addEventListener('resize',()=>{
+  const a=document.querySelector('.tab.active');
+  if(a){if(a.dataset.tab==='feat')drawFeat();else if(a.dataset.tab==='ring'){}else{}}
+});
+</script>
+</body>
+</html>

@@ -9,6 +9,20 @@ This project aims to predict the loan approval status of applicants based on var
 - **Model Training**: Implementation of a Random Forest Classifier with 100 estimators.
 - **Robust Evaluation**: Includes 5-fold cross-validation and detailed classification reports.
 - **Model Persistence**: Saves the trained model using `joblib` for future deployment.
+- **Interactive Showcase**: A premium web-based visualization of model performance and insights.
+
+## 🎨 Interactive Showcase
+
+The project includes a standalone **Interactive Showcase** (`loan-showcase.html`) that provides a premium visual overview of the model's performance.
+
+### Key Features:
+- **Live Metrics**: Real-time animation of Accuracy, Cross-Validation scores, and Approval rates.
+- **Feature Importance**: Dynamic bar chart showing which factors (like Credit History) drive the model's decisions.
+- **Accuracy Breakdown**: Visual representation of correct vs. incorrect predictions on the test set.
+- **Data Insights**: Curated findings discovered during the analysis of 500 applicants.
+
+To view it, simply open `loan-showcase.html` in any modern web browser.
+
 
 ## 📊 Dataset
 
